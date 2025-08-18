@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
-const { applyUserMiddlewares } = require('../middleware/auth');
+const bcrypt = require('bcryptjs');
+const crypto = require('crypto');
 const uniqueValidator = require('mongoose-unique-validator');
 
 const userSchema = new mongoose.Schema({
@@ -21,38 +22,45 @@ const userSchema = new mongoose.Schema({
     maxlength: [20, '20 caractères maximum'],
     select: false
   },
-  resetPasswordToken: {
-    type: String,
-    select: false
-  },
-  resetPasswordExpires: { // Nom corrigé avec "s"
-    type: Date,
-    select: false
-  },
-  isActive: {
-    type: Boolean,
-    default: true
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now
-  },
-  updatedAt: {
-    type: Date,
-    default: Date.now
-  }
+  resetPasswordToken: { type: String, select: false },
+  resetPasswordExpires: { type: Date, select: false },
+  isActive: { type: Boolean, default: true },
+  createdAt: { type: Date, default: Date.now },
+  updatedAt: { type: Date, default: Date.now }
 });
 
-// Plugin d'unicité
+// Plugins
 userSchema.plugin(uniqueValidator);
 
-// Application des middlewares
-applyUserMiddlewares(userSchema);
+// Middlewares
+userSchema.pre('save', async function(next) {
+  if (this.isModified('password')) {
+    this.password = await bcrypt.hash(this.password, 12);
+  }
+  this.updatedAt = Date.now();
+  next();
+});
 
-// Middleware pour les mises à jour
 userSchema.pre('findOneAndUpdate', function(next) {
   this.set({ updatedAt: Date.now() });
   next();
 });
+
+// Méthodes
+userSchema.methods.comparePassword = async function(candidatePassword) {
+  return await bcrypt.compare(candidatePassword, this.password);
+};
+
+userSchema.methods.createPasswordResetToken = function() {
+  const resetToken = crypto.randomBytes(32).toString('hex');
+
+  this.resetPasswordToken = crypto
+    .createHash('sha256')
+    .update(resetToken)
+    .digest('hex');
+
+  this.resetPasswordExpires = Date.now() + 10 * 60 * 1000;
+  return resetToken;
+};
 
 module.exports = mongoose.model('User', userSchema);
