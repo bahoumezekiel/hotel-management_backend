@@ -13,17 +13,21 @@ const authRoutes = require('./routes/auth');
 
 // Connexion à MongoDB
 mongoose.connect(process.env.MONGODB_URI || 'mongodb+srv://bahoumezekiel:L7RI7p7oBr0p90y2@cluster0.5ldppvs.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0',
-  { useNewUrlParser: true,
-    useUnifiedTopology: true })
+  { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => console.log('Connexion à MongoDB réussie !'))
   .catch(() => console.log('Connexion à MongoDB échouée !'));
 
 // Middleware CORS pour permettre les requêtes du frontend
 app.use(cors({
-  origin: ['http://localhost:5173', 'http://localhost:3000', 'http://localhost:3001', 'https://hotel-management-frontend-ovn1.vercel.app'], // Ajustez selon votre frontend
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  origin: [
+    'http://localhost:5173',
+    'http://localhost:3000',
+    'http://localhost:3001',
+    'https://hotel-management-frontend-ovn1.vercel.app' // ton frontend Vercel
+  ],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true,
+  credentials: true
 }));
 
 // Middleware pour parser le JSON
@@ -39,14 +43,14 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/images', express.static(path.join(__dirname, 'images')));
 
 // Routes
-app.use('/api/hotels', hotelRoutes);
 app.use('/api/auth', authRoutes);
+app.use('/api/hotels', hotelRoutes);
 
 // Route de test
 app.get('/', (req, res) => {
   res.json({
     success: true,
-    message: 'API de gestion d\'hôtels fonctionne correctement!'
+    message: "API de gestion d'hôtels fonctionne correctement !"
   });
 });
 
