@@ -23,7 +23,7 @@ app.use(cors({
     'http://localhost:5173',
     'http://localhost:3000',
     'http://localhost:3001',
-    'https://hotel-management-frontend-ovn1.vercel.app' // ton frontend Vercel
+    'https://hotel-management-frontend-qc2e.vercel.app' // ton frontend Vercel
   ],
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
