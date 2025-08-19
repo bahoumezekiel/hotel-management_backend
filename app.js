@@ -20,7 +20,7 @@ mongoose.connect(process.env.MONGODB_URI || 'mongodb+srv://bahoumezekiel:L7RI7p7
 
 // Middleware CORS pour permettre les requêtes du frontend
 app.use(cors({
-  origin: ['http://localhost:5173', 'http://localhost:3000', 'http://localhost:3001'], // Ajustez selon votre frontend
+  origin: ['http://localhost:5173', 'http://localhost:3000', 'http://localhost:3001', 'https://hotel-management-frontend-ovn1.vercel.app'], // Ajustez selon votre frontend
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true,
